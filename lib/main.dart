@@ -17,6 +17,10 @@ class MyApp extends StatelessWidget {
       title: 'PassTrack',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        appBarTheme: const AppBarTheme(
+          titleTextStyle: TextStyle(color: Colors.white, fontSize: 20),
+          iconTheme: IconThemeData(color: Colors.white),
+        ),
         colorScheme: ColorScheme.fromSeed(seedColor: mcgpalette0[50]!),
         useMaterial3: true,
       ),
