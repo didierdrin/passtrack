@@ -126,7 +126,7 @@ class _BookingPageState extends State<BookingPage> {
 
             InkWell(
               onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (_)=> const TicketDetailsPage()));
+                // Navigator.push(context, MaterialPageRoute(builder: (_)=> );//TicketDetailsPage(ticketDetails: ,)));
               },
               child: Padding(
                 padding: const EdgeInsets.all(10.0),
