@@ -1,6 +1,7 @@
 // Profile page
 import 'package:flutter/material.dart';
 import 'package:passtrack/colors.dart';
+import 'package:passtrack/pages/sign.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -33,12 +34,17 @@ class _ProfilePageState extends State<ProfilePage> {
                         height: 10,
                       ),
                       ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (_) => const SignInUp()));
+                          },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: mcgpalette0[50],
                             fixedSize: const Size(240, 40),
-                            ),
-                          child: const Text("Sign In", style: TextStyle(color: Colors.white),)),
+                          ),
+                          child: const Text(
+                            "Sign In",
+                            style: TextStyle(color: Colors.white),
+                          )),
                       const SizedBox(
                         height: 10,
                       ),

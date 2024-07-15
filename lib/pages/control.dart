@@ -125,7 +125,7 @@ class _ControlPageState extends State<ControlPage> {
                               price: "State Management - GetX"))); */
                 },
                 leading: const Icon(Icons.wb_sunny_outlined),
-                title: const Text("Weather Forecast"), // Order History
+                title: const Text("Weather Forecast"),     // Order History
               ),
               const Divider(
                 thickness: 1,
