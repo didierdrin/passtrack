@@ -1,7 +1,10 @@
 // Control Page
 import 'package:flutter/material.dart';
 import 'package:passtrack/colors.dart';
-
+import 'package:passtrack/pages/help.dart';
+import 'package:passtrack/pages/notifications.dart';
+import 'package:passtrack/pages/settings.dart';
+import 'package:passtrack/pages/tickethistory.dart';
 // Page imports
 import 'home.dart';
 import 'booking.dart';
@@ -44,8 +47,20 @@ class _ControlPageState extends State<ControlPage> {
         backgroundColor: mcgpalette0[50],
         title: Text(_title),
         actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.chat)),
-          IconButton(onPressed: () {}, icon: const Icon(Icons.notifications)),
+          IconButton(
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => const HelpPage()));
+              },
+              icon: const Icon(Icons.chat)),
+          IconButton(
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => const NotificationsPage()));
+              },
+              icon: const Icon(Icons.notifications)),
         ],
       ),
       drawer: SafeArea(
@@ -125,7 +140,7 @@ class _ControlPageState extends State<ControlPage> {
                               price: "State Management - GetX"))); */
                 },
                 leading: const Icon(Icons.wb_sunny_outlined),
-                title: const Text("Weather Forecast"),     // Order History
+                title: const Text("Weather Forecast"), // Order History
               ),
               const Divider(
                 thickness: 1,
@@ -134,7 +149,10 @@ class _ControlPageState extends State<ControlPage> {
               ),
               ListTile(
                 onTap: () {
-                  //Navigator.push(context,MaterialPageRoute(builder: (_) => const HelpPage()));
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const TicketHistoryPage()));
                 },
                 leading: const Icon(Icons.history_rounded),
                 title: const Text("Ticket History"), // Order History
@@ -146,7 +164,8 @@ class _ControlPageState extends State<ControlPage> {
               ),
               ListTile(
                 onTap: () {
-                  //Navigator.push(context, MaterialPageRoute(builder: (_) => const HelpPage()));
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (_) => const HelpPage()));
                 },
                 leading: const Icon(Icons.help_outline),
                 title: const Text("Help"), // Order History
@@ -158,7 +177,7 @@ class _ControlPageState extends State<ControlPage> {
               ),
               ListTile(
                 onTap: () {
-                  // Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsPage()));
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsPage()));
                 },
                 leading: const Icon(Icons.settings_outlined),
                 title: const Text("Settings"),
@@ -166,7 +185,7 @@ class _ControlPageState extends State<ControlPage> {
               const Spacer(),
               ListTile(
                 leading: const Icon(Icons.logout_outlined),
-                title: const Text("Sign Out"),
+                title: const Text("Log Out"),
                 onTap: () {
                   // AuthService().signOut();
                 },
@@ -224,7 +243,7 @@ class _ControlPageState extends State<ControlPage> {
         unselectedItemColor: Colors.black,
         currentIndex: _pageIndex,
         selectedItemColor: Colors.green,
-        showUnselectedLabels: true, 
+        showUnselectedLabels: true,
         unselectedLabelStyle: const TextStyle(
           color: Colors.black45,
         ),

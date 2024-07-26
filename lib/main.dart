@@ -1,10 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:passtrack/firebase_options.dart';
 import 'pages/control.dart';
 import 'colors.dart';
+import 'package:provider/provider.dart';
+import 'package:passtrack/components/post_provider.dart';
+import 'package:firebase_core/firebase_core.dart';
 
-
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => PostProvider()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -14,7 +28,7 @@ class MyApp extends StatelessWidget {
   @override                                                                                                                                                                                                                               
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'PassTrack',
+      title: 'Volcano Express',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         appBarTheme: const AppBarTheme(

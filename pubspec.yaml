@@ -36,6 +36,17 @@ dependencies:
   flutter_svg: 
   flutter_native_splash: 
   dotted_line: ^3.2.2
+  firebase_auth: ^4.16.0
+  firebase_core: ^2.32.0
+  cloud_firestore: ^4.17.5
+  google_sign_in: ^6.2.1
+  provider: ^6.1.2
+  google_generative_ai: ^0.4.3
+  get: ^4.6.6
+  flutter_braintree: ^4.0.0
+  flutterwave_standard: ^1.0.8
+  logger: ^2.4.0
+  uuid: ^4.4.2
 
 
 flutter_native_splash:
@@ -70,6 +81,10 @@ flutter:
     - assets/images/imgSample.png 
     - assets/images/busSvg.svg 
     - assets/images/rightLeftSvg.svg 
+    - assets/images/logos_paypalpaypal logo svg.svg
+    - assets/images/fontisto_paypalpaypalsvg.svg
+    - assets/images/ion_card-outlinecardsvg.svg
+    - assets/images/mtn.png
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

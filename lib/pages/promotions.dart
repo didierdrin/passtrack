@@ -28,17 +28,35 @@ class _PromotionsPageState extends State<PromotionsPage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      IconButton(
-                        icon: Icon(Icons.bus_alert, color: mcgpalette0[50],),
-                        onPressed: () {},
+                      Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15),
+                        
                       ),
+                      child: IconButton(
+                        icon: const Icon(
+                          Icons.directions_bus,
+                          color: Colors.green,
+                        ),
+                        onPressed: () => print('Settings button pressed'),
+                      ),
+                    ),
                       const SizedBox(
                         width: 10,
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.railway_alert),
+                      Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15),
+                        color: Colors.black,
+                      ),
+                      child: IconButton(
+                        icon: const Icon(
+                          Icons.directions_railway,
+                          color: Colors.green,
+                        ),
                         onPressed: () => print('Settings button pressed'),
                       ),
+                    ),
                       const Spacer(),
                       const Text("|"),
                       const SizedBox(
@@ -50,7 +68,7 @@ class _PromotionsPageState extends State<PromotionsPage> {
                 ),
               ),
               // Top navigationBar items
-              SizedBox(
+              const SizedBox(
                 height: 200,
               ),
               Icon(

@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "491220286264",
+    "project_id": "passtrack-3e434",
+    "storage_bucket": "passtrack-3e434.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:491220286264:android:9cf12a88695c49f72e9fcd",
+        "android_client_info": {
+          "package_name": "com.example.passtrack"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "491220286264-rfvncch0fvpalarl8ef08tsphaipo18q.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.passtrack",
+            "certificate_hash": "2e4bd0cb7b0d130fedeada80cec4430bc49fb3e3"
+          }
+        },
+        {
+          "client_id": "491220286264-k0p472mse7q71257bcbeshn23ca060rc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDVibO-mEIqqDGCHqo2mtnriUr1YsbDkeA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "491220286264-k0p472mse7q71257bcbeshn23ca060rc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

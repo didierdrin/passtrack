@@ -16,6 +16,19 @@ class _BookingPageState extends State<BookingPage> {
   String busSvg = 'assets/images/busSvg.svg';
   String rightLeftSvg = 'assets/images/rightLeftSvg';
 
+  final List<String> cities = ['Kigali', 'Muhanga', 'Huye', 'Musanze'];
+  String? fromCity;
+  String? toCity;
+
+  void _swapCities() {
+    setState(() {
+      final temp = fromCity;
+      fromCity = toCity;
+      toCity = temp;
+    });
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,45 +36,84 @@ class _BookingPageState extends State<BookingPage> {
         scrollDirection: Axis.vertical,
         child: Column(
           children: [
+            // Dropdowns
             Container(
-              decoration: BoxDecoration(
-                color: mcgpalette0[50],
-              ),
-              child: Row(
-                children: [
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  Expanded(
-                    child: TextFormField(
-                      style: TextStyle(color: Colors.grey[200]),
-                      decoration: InputDecoration(
-                        hintText: '\t\t\tFrom',
-                        hintStyle: TextStyle(color: Colors.grey[400]),
-                        border: InputBorder.none,
-                      ),
-                    ),
-                  ),
-                  const Icon(
-                    Icons.compare_arrows_outlined,
-                    color: Colors.white,
-                  ),
-                  const SizedBox(
-                    width: 15,
-                  ),
-                  Expanded(
-                    child: TextFormField(
-                      style: TextStyle(color: Colors.grey[200]),
-                      decoration: InputDecoration(
-                        hintText: '\t\t\tTo',
-                        hintStyle: TextStyle(color: Colors.grey[400]),
-                        border: InputBorder.none,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+            decoration: BoxDecoration(
+              color: mcgpalette0[50],
+              border: Border(top: BorderSide(width: 1, color: Colors.grey[400]!), bottom: BorderSide.none, right: BorderSide.none, left: BorderSide.none)
             ),
+            child: Row(
+              children: [
+                const SizedBox(width: 10),
+                Expanded(
+                  child: DropdownButtonFormField<String>(
+                    value: fromCity,
+                    hint: Text('\t\t\tFrom', style: TextStyle(color: Colors.grey[400])),
+                    dropdownColor: mcgpalette0[50],
+                    style: TextStyle(color: Colors.grey[200]),
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                    ),
+                    items: cities.map((String city) {
+                      return DropdownMenuItem<String>(
+                        value: city,
+                        child: Text(city),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        fromCity = newValue;
+                      });
+                    },
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.compare_arrows_outlined, color: Colors.white),
+                  onPressed: _swapCities,
+                ),
+                Expanded(
+                  child: DropdownButtonFormField<String>(
+                    value: toCity,
+                    hint: Text('\t\t\tTo', style: TextStyle(color: Colors.grey[400])),
+                    dropdownColor: mcgpalette0[50],
+                    style: TextStyle(color: Colors.grey[200]),
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                    ),
+                    items: cities.map((String city) {
+                      return DropdownMenuItem<String>(
+                        value: city,
+                        child: Text(city),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        toCity = newValue;
+                      });
+                    },
+                  ),
+                ),
+
+                Padding(
+                  padding: const EdgeInsets.all(5.0),
+                  child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(15),
+                          color: Colors.white38,
+                        ),
+                        child: IconButton(
+                          icon: Icon(
+                            Icons.search,
+                            color: Colors.green[700],
+                          ),
+                          onPressed: () => print('Settings button pressed'),
+                        ),
+                      ),
+                ),
+              ],
+            ),
+          ),
+
             Padding(
               padding: const EdgeInsets.all(15.0),
               child: Container(
@@ -73,14 +125,14 @@ class _BookingPageState extends State<BookingPage> {
                   children: [
                     Container(
                       decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15),
-                          color: Colors.green),
+                        borderRadius: BorderRadius.circular(15),
+                      ),
                       child: IconButton(
                         icon: const Icon(
                           Icons.directions_bus,
-                          color: Colors.black,
+                          color: Colors.green,
                         ),
-                        onPressed: () {},
+                        onPressed: () => print('Settings button pressed'),
                       ),
                     ),
                     const SizedBox(
@@ -126,7 +178,20 @@ class _BookingPageState extends State<BookingPage> {
 
             InkWell(
               onTap: () {
-                // Navigator.push(context, MaterialPageRoute(builder: (_)=> );//TicketDetailsPage(ticketDetails: ,)));
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => TicketDetailsPage(
+                      ticketDetails: TicketDetails(
+                        busName: "HYUNDAI UNIVERSE",
+                        from: "Kigali",
+                        to: "Muhanga",
+                        date: "15-May-2025",
+                        time: "9:00 AM",
+                      ),
+                    ),
+                  ),
+                );
               },
               child: Padding(
                 padding: const EdgeInsets.all(10.0),
@@ -220,7 +285,7 @@ class _BookingPageState extends State<BookingPage> {
                                             fontSize: 11, color: Colors.grey),
                                       ),
                                       Text(
-                                        "Musanze",
+                                        "Muhanga",
                                         style: TextStyle(color: Colors.blue),
                                       ),
                                       Text(
