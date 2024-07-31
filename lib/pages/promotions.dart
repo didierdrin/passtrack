@@ -1,6 +1,6 @@
 // Promotions page
 import 'package:flutter/material.dart';
-import 'package:passtrack/colors.dart';
+//import 'package:passtrack/colors.dart';
 
 class PromotionsPage extends StatefulWidget {
   const PromotionsPage({super.key});
@@ -71,11 +71,11 @@ class _PromotionsPageState extends State<PromotionsPage> {
               const SizedBox(
                 height: 200,
               ),
-              Icon(
+              const Icon(
                 Icons.find_in_page,
                 size: 60,
               ),
-              Text("There are no promotions available"),
+              const Text("There are no promotions available"),
             ],
           ),
         ),

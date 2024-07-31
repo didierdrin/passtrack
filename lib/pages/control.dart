@@ -94,7 +94,7 @@ class _ControlPageState extends State<ControlPage> {
                                 ),
                           ),
                           title: const Text(
-                            "Didier Codeseal",
+                            "Codeseal",
                             //"${FirebaseAuth.instance.currentUser!.displayName}",
                             style: TextStyle(
                                 fontSize: 13,

@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:passtrack/colors.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+//import 'package:flutter_svg/flutter_svg.dart';
 import 'package:passtrack/pages/ticketdetails.dart';
 
 class BookingPage extends StatefulWidget {

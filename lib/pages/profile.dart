@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:passtrack/colors.dart';
 import 'package:passtrack/pages/sign.dart';
+import 'package:flutter/gestures.dart';
+import  'package:passtrack/pages/planto.dart'; 
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -35,7 +37,10 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                       ElevatedButton(
                           onPressed: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (_) => const SignInUp()));
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => const SignInUp()));
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: mcgpalette0[50],
@@ -49,14 +54,22 @@ class _ProfilePageState extends State<ProfilePage> {
                         height: 10,
                       ),
                       RichText(
-                          text: const TextSpan(
-                              style: TextStyle(color: Colors.black),
-                              children: [
-                            TextSpan(text: "Don't have and account? "),
+                        text: TextSpan(
+                          style: const TextStyle(color: Colors.black),
+                          children: [
+                            const TextSpan(text: "Don't have an account? "),
                             TextSpan(
-                                text: "Create an Account",
-                                style: TextStyle(color: Colors.green)),
-                          ])),
+                              text: "Create an Account",
+                              style: const TextStyle(color: Colors.green),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (_) => const SignInUp())),
+                            ),
+                          ],
+                        ),
+                      )
                     ],
                   ),
                 ),
@@ -71,15 +84,8 @@ class _ProfilePageState extends State<ProfilePage> {
                   padding: const EdgeInsets.all(15.0),
                   child: Column(
                     children: [
-                      ListTile(
-                        title: const Text("Purchased tickets"),
-                        onTap: () {},
-                      ),
-                      const Divider(
-                        thickness: 1,
-                        endIndent: 20,
-                        indent: 20,
-                      ),
+                      
+          
                       ListTile(
                         title: const Text("Language"),
                         trailing: const Text("English(US)"),
@@ -113,7 +119,9 @@ class _ProfilePageState extends State<ProfilePage> {
                       ListTile(
                         title: const Text("Plan-To"),
                         trailing: const Icon(Icons.keyboard_arrow_right),
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (_) => const PlanToPage())); 
+                        },
                       ),
                       const Divider(
                         thickness: 1,

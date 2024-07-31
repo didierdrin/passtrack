@@ -41,11 +41,11 @@ class _HomePageState extends State<HomePage> {
              Consumer<PostProvider>(
               builder: (context, postProvider, child) {
                 if (postProvider.posts.isEmpty) {
-                  return CircularProgressIndicator();
+                  return const CircularProgressIndicator();
                 }
                 return ListView.builder(
                   shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
+                  physics: const NeverScrollableScrollPhysics(),
                   itemCount: postProvider.posts.length,
                   itemBuilder: (context, index) {
                     return _feedCard(postProvider.posts[index]);

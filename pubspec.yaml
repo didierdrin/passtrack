@@ -47,6 +47,8 @@ dependencies:
   flutterwave_standard: ^1.0.8
   logger: ^2.4.0
   uuid: ^4.4.2
+  flutter_local_notifications: ^17.2.1+2
+  timezone: ^0.9.4
 
 
 flutter_native_splash:
