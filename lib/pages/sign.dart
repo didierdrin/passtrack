@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:passtrack/colors.dart';
+import 'package:logger/logger.dart';
+import 'package:passtrack/components/auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SignInUp extends StatefulWidget {
   const SignInUp({super.key});
@@ -9,10 +12,58 @@ class SignInUp extends StatefulWidget {
 }
 
 class _SignInUpState extends State<SignInUp> {
+  bool _obscurePassword = true;
+  final logger = Logger();
   final _formKey = GlobalKey<FormState>();
   String _email = '';
   String _password = '';
+  String _phoneNumber = '';
   bool _isSignUp = false;
+
+  final AuthService _authService = AuthService();
+
+  void _handleSignInOrSignUp() async {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+
+      UserCredential? result;
+      if (_isSignUp) {
+        if (_email.isNotEmpty) {
+          result = await _authService.createUserWithEmail(_email, _password);
+        } else if (_phoneNumber.isNotEmpty) {
+          result = await _authService.signInWithPhone(_phoneNumber); 
+
+        //   ScaffoldMessenger.of(context).showSnackBar(
+        //   const SnackBar(content: Text('Phone sign-up not implemented yet.')),
+        // );
+        // return;
+
+        }
+      } else {
+        if (_email.isNotEmpty) {
+          result = await _authService.signInWithEmail(_email, _password);
+        } else if (_phoneNumber.isNotEmpty) {
+          result = await _authService.signInWithPhone(_phoneNumber);
+        }
+      }
+
+      if (result != null) {
+         Navigator.of(context)
+             .pop(true); // Return true to indicate successful login
+
+      // Navigator.of(context).pushReplacement(
+      //   MaterialPageRoute(builder: (context) => const HomePage()),
+      // );
+
+      } else {
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Authentication failed. Please try again.')),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +112,9 @@ class _SignInUpState extends State<SignInUp> {
             children: <Widget>[
               TextFormField(
                 decoration: InputDecoration(
-                  labelText: type == 'phone' ? 'Enter your phone number' : 'Enter your email',
+                  labelText: type == 'phone'
+                      ? 'Enter your phone number'
+                      : 'Enter your email',
                 ),
                 validator: (value) {
                   if (value!.isEmpty) {
@@ -69,15 +122,30 @@ class _SignInUpState extends State<SignInUp> {
                   }
                   return null;
                 },
-                onSaved: (value) => _email = value!,
+                onSaved: (value) {
+                  if (type == 'phone') {
+                    _phoneNumber = value!;
+                  } else {
+                    _email = value!;
+                  }
+                },
               ),
               const SizedBox(height: 20.0),
               TextFormField(
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Enter password',
-                  suffixIcon: Icon(Icons.visibility_off),
+                  suffixIcon: IconButton(
+                    icon: Icon(_obscurePassword
+                        ? Icons.visibility_off
+                        : Icons.visibility),
+                    onPressed: () {
+                      setState(() {
+                        _obscurePassword = !_obscurePassword;
+                      });
+                    },
+                  ),
                 ),
-                obscureText: true,
+                obscureText: _obscurePassword,
                 validator: (value) {
                   if (value!.isEmpty) {
                     return 'Please enter your password.';
@@ -89,11 +157,20 @@ class _SignInUpState extends State<SignInUp> {
               if (_isSignUp) ...[
                 const SizedBox(height: 20.0),
                 TextFormField(
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'Confirm password',
-                    suffixIcon: Icon(Icons.visibility_off),
+                    suffixIcon: IconButton(
+                    icon: Icon(_obscurePassword
+                        ? Icons.visibility_off
+                        : Icons.visibility),
+                    onPressed: () {
+                      setState(() {
+                        _obscurePassword = !_obscurePassword;
+                      });
+                    },
                   ),
-                  obscureText: true,
+                  ),
+                  obscureText: _obscurePassword,
                   validator: (value) {
                     if (value!.isEmpty) {
                       return 'Please confirm your password.';
@@ -108,31 +185,31 @@ class _SignInUpState extends State<SignInUp> {
               const SizedBox(height: 20.0),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: mcgpalette0[50],
-                  minimumSize: const Size(double.infinity, 40)
-                ),
+                    backgroundColor: mcgpalette0[50],
+                    minimumSize: const Size(double.infinity, 40)),
                 onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    _formKey.currentState!.save();
-                    print('${_isSignUp ? "Sign Up" : "Sign In"}: $_email, Password: $_password');
-                  }
+                  _handleSignInOrSignUp();
                 },
-                child: Text(_isSignUp ? 'Sign Up' : 'Sign In', style: const TextStyle(color: Colors.white)),
+                child: Text(_isSignUp ? 'Sign Up' : 'Sign In',
+                    style: const TextStyle(color: Colors.white)),
               ),
               if (!_isSignUp) ...[
                 const SizedBox(height: 20.0),
                 TextButton(
                   onPressed: () {
-                    print('Forgot password clicked');
+                    logger.d('Forgot password clicked');
                   },
-                  child: const Text('Forgot password?', style: TextStyle(color: Colors.blue)),
+                  child: const Text('Forgot password?',
+                      style: TextStyle(color: Colors.blue)),
                 ),
               ],
               const SizedBox(height: 20.0),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Text(_isSignUp ? 'Already have an account?' : 'Don\'t have an account?'),
+                  Text(_isSignUp
+                      ? 'Already have an account?'
+                      : 'Don\'t have an account?'),
                   TextButton(
                     onPressed: () {
                       setState(() {

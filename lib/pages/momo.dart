@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:passtrack/colors.dart';
 import 'package:passtrack/pages/confirm.dart';
 import 'package:flutter/material.dart';
@@ -5,8 +7,23 @@ import 'package:flutterwave_standard/flutterwave.dart';
 import 'package:uuid/uuid.dart';
 import 'package:logger/logger.dart';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:passtrack/pages/tickethistory.dart';
+
 class MomoPage extends StatefulWidget {
-  const MomoPage({super.key});
+  final String? name;
+  final String? email;
+  final double? price;
+  final String? route_from;
+  final String? route_to;
+  const MomoPage(
+      {super.key,
+      required this.name,
+      required this.email,
+      required this.price,
+      required this.route_from,
+      required this.route_to});
   @override
   State<MomoPage> createState() => _MomoPageState();
 }
@@ -26,12 +43,60 @@ class _MomoPageState extends State<MomoPage> {
 
   bool isTestMode = true;
 
+  Future<void> sendTicketDetailsToFirestore(
+      String name, double price, String route_from, String route_to) async {
+    try {
+      // Get the current user
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        // Create a reference to the user's tickethistory collection
+        CollectionReference ticketHistory = FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .collection('tickethistory');
+
+        // Add a new document with a generated ID
+        await ticketHistory.add({
+          'ticketdetails': {
+            'name': name,
+            'price': price,
+            'route_from': route_from,
+            'route_to': route_to,
+            'purchaseDate': FieldValue.serverTimestamp(),
+          },
+          'userdetails': {
+            'name': user.email ?? 'Unknown',
+          },
+        });
+
+        // Create a reference to the totalpurchases collection
+        CollectionReference totalPurchases =
+            FirebaseFirestore.instance.collection('totalpurchases');
+
+        await totalPurchases.add({
+          'name': name,
+          'price': price,
+          'route_from': route_from, 
+          'route_to': route_to,
+          'purchaseDate': FieldValue.serverTimestamp(),
+        });
+
+        logger.d('Ticket details sent to Firestore successfully');
+      } else {
+        logger.e('No user is currently signed in');
+      }
+    } catch (e) {
+      logger.e('Error sending ticket details to Firestore: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     currencyController.text = selectedCurrency;
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: mcgpalette0[50],
         title: const Text("MomoPay"),
       ),
       body: Container(
@@ -41,7 +106,8 @@ class _MomoPageState extends State<MomoPage> {
           key: formKey,
           child: ListView(
             children: <Widget>[
-              Container(
+              /*
+              Container( 
                 margin: const EdgeInsets.fromLTRB(0, 20, 0, 10),
                 child: TextFormField(
                   controller: amountController,
@@ -53,7 +119,7 @@ class _MomoPageState extends State<MomoPage> {
                       ? null
                       : "Amount is required",
                 ),
-              ),
+              ),*/
               Container(
                 margin: const EdgeInsets.fromLTRB(0, 20, 0, 10),
                 child: TextFormField(
@@ -70,6 +136,7 @@ class _MomoPageState extends State<MomoPage> {
                       : "Currency is required",
                 ),
               ),
+              /*
               Container(
                 margin: const EdgeInsets.fromLTRB(0, 20, 0, 10),
                 child: TextFormField(
@@ -80,7 +147,7 @@ class _MomoPageState extends State<MomoPage> {
                     hintText: "Email",
                   ),
                 ),
-              ),
+              ), */
               Container(
                 margin: const EdgeInsets.fromLTRB(0, 20, 0, 10),
                 child: TextFormField(
@@ -139,7 +206,9 @@ class _MomoPageState extends State<MomoPage> {
   }
 
   _handlePaymentInitialization() async {
-    final Customer customer = Customer(email: "customer@customer.com");
+    User? user = FirebaseAuth.instance.currentUser;
+    final Customer customer =
+        Customer(email: user!.email ?? "customer@passtrack.com");
 
     final Flutterwave flutterwave = Flutterwave(
         context: context,
@@ -147,31 +216,112 @@ class _MomoPageState extends State<MomoPage> {
         currency: selectedCurrency,
         redirectUrl: 'https://facebook.com',
         txRef: const Uuid().v1(),
-        amount: amountController.text.toString().trim(),
+        amount: (widget.price).toString(), // amountController.text.toString(),
         customer: customer,
         paymentOptions: "card, payattitude, barter, bank transfer, ussd",
-        customization: Customization(title: "Test Payment"),
+        customization: Customization(title: "Make Payment"),
         isTestMode: isTestMode);
     final ChargeResponse response = await flutterwave.charge();
     if (response.status == "successful") {
       // Show payment confirmation dialog
       showLoading(response.toString());
+
+      // Send ticket details to Firestore
+      //await sendTicketDetailsToFirestore(widget.name, widget.price);
+
       _navigateToConfirmPage();
     } else {
+      final scaffoldMessenger = ScaffoldMessenger.of(context);
       showLoading(response.toString());
+      logger.d('Card payment failed');
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          // Combine label and content into a single Row for top alignment
+          content: const Row(
+            mainAxisAlignment:
+                MainAxisAlignment.start, // Align content horizontally
+            children: [
+              Text(
+                  "Payment failed\nReason: Card declined"), // Short text at the end
+              Flexible(
+                // Makes label text wrap if needed
+                child: SizedBox(
+                  width: 100,
+                  child: Text(
+                    "",
+                    style:
+                        TextStyle(fontSize: 14), // Adjust font size as needed
+                  ),
+                ),
+              ),
+            ],
+          ),
+          backgroundColor: Colors.redAccent,
+          action: SnackBarAction(
+            label: "Choose Payment Option",
+            onPressed: () {
+              // Navigator.pop(context);
+            }, // On-click action
+          ),
+          duration: const Duration(seconds: 3),
+        ),
+      );
     }
     //showLoading(response.toString());
     //logger.d("${response.toJson()}");
   }
 
-  void _navigateToConfirmPage() {
-    Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (_) => const ConfirmPage(
-                  name: "Some name",
-                  imgUrl: "Some imgUrl",
-                  price: "Some Price")));
+  void _navigateToConfirmPage() async {
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    logger.d('Momo payment successful: Successful');
+    // Send ticket details to Firestore Card Payment 1
+    await sendTicketDetailsToFirestore(
+        widget.name!, widget.price!, widget.route_from!, widget.route_to!);
+
+    // Navigate to ConfirmPage and remove all previous routes
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ConfirmPage(
+          name: widget.name!,
+          price: widget.price!,
+        ),
+      ),
+      (route) => false, // This will remove all previous routes
+    );
+
+    scaffoldMessenger.showSnackBar(
+      SnackBar(
+        // Combine label and content into a single Row for top alignment
+        content: const Row(
+          mainAxisAlignment:
+              MainAxisAlignment.start, // Align content horizontally
+          children: [
+            Text("Payment executed\nsuccessfully!"), // Short text at the end
+            Flexible(
+              // Makes label text wrap if needed
+              child: SizedBox(
+                width: 100,
+                child: Text(
+                  "",
+                  style: TextStyle(fontSize: 14), // Adjust font size as needed
+                ),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: Colors.greenAccent,
+        action: SnackBarAction(
+          label: "Find your ticket",
+          onPressed: () {
+            Navigator.pushReplacement(context,
+                MaterialPageRoute(builder: (_) => const TicketHistoryPage()));
+            // Navigator.pop(context);
+          }, // On-click action
+        ),
+        duration: const Duration(seconds: 3),
+      ),
+    );
   }
 
   void _openBottomSheet() {
@@ -183,7 +333,7 @@ class _MomoPageState extends State<MomoPage> {
   }
 
   Widget _getCurrency() {
-    final currencies = ["NGN", "RWF", "UGX", "KES", "ZAR", "USD", "GHS", "TZS"];
+    final currencies = ["RWF"]; // ["UGX", "KES", "ZAR", "USD", "GHS", "TZS"];
     return Container(
       height: 250,
       margin: const EdgeInsets.fromLTRB(0, 10, 0, 0),

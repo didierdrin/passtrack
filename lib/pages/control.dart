@@ -5,6 +5,9 @@ import 'package:passtrack/pages/help.dart';
 import 'package:passtrack/pages/notifications.dart';
 import 'package:passtrack/pages/settings.dart';
 import 'package:passtrack/pages/tickethistory.dart';
+import 'package:passtrack/components/auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:passtrack/pages/weatherforecast.dart';
 // Page imports
 import 'home.dart';
 import 'booking.dart';
@@ -18,7 +21,7 @@ class ControlPage extends StatefulWidget {
 }
 
 class _ControlPageState extends State<ControlPage> {
-  String imgSample = "assets/images/imgSample.png";
+  String imgSample = "assets/images/volicon.png";
   String _title = "Home";
   static int _pageIndex = 0;
 
@@ -89,40 +92,50 @@ class _ControlPageState extends State<ControlPage> {
                           leading: SizedBox(
                             height: 40,
                             width: 40,
-                            child: Image.asset(imgSample
-                                //"${FirebaseAuth.instance.currentUser!.photoURL}",
-                                ),
+                            child: Image.asset(imgSample),
                           ),
-                          title: const Text(
-                            "Codeseal",
-                            //"${FirebaseAuth.instance.currentUser!.displayName}",
-                            style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-                                color: mcgpalette0),
+                          title: StreamBuilder<User?>(
+                            stream: FirebaseAuth.instance.authStateChanges(),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData && snapshot.data != null) {
+                                // User is logged in
+                                return SizedBox(
+                                  width: 70,
+                                  child: Text(
+                                    snapshot.data!.email ?? "User",
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
+                                      color: mcgpalette0,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                );
+                              } else {
+                                // User is not logged in
+                                return const Text(
+                                  "Guest User",
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                    color: mcgpalette0,
+                                  ),
+                                );
+                              }
+                            },
                           ),
-                          subtitle: const Text(
-                            "Active Now"
-                            /*
-                            FirebaseAuth.instance.currentUser != null
-                                ? "Active Now"
-                                : "Logged Out" */
-                            ,
-                            style: TextStyle(color: Colors.grey, fontSize: 10),
+                          subtitle: StreamBuilder<User?>(
+                            stream: FirebaseAuth.instance.authStateChanges(),
+                            builder: (context, snapshot) {
+                              return Text(
+                                snapshot.hasData ? "Active Now" : "Logged Out",
+                                style: const TextStyle(
+                                    color: Colors.grey, fontSize: 10),
+                              );
+                            },
                           ),
-                          //trailing: const Icon(Icons.cancel_outlined),
                           onTap: () {
-                            /*
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                  builder: (_) => ControlPage(
-                                        customIndex:
-                                            FirebaseAuth.instance.currentUser ==
-                                                    null
-                                                ? 3
-                                                : 0,
-                                      )),
-                            ); */
+                            // Your onTap logic here
                           },
                         ),
                       ]),
@@ -130,17 +143,13 @@ class _ControlPageState extends State<ControlPage> {
               ),
               ListTile(
                 onTap: () {
-                  /*
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (_) => const CartPage(
-                              name: "Cart List",
-                              imgUrl: "Cart item from list",
-                              price: "State Management - GetX"))); */
+                          builder: (_) => const TicketHistoryPage()));
                 },
-                leading: const Icon(Icons.wb_sunny_outlined),
-                title: const Text("Weather Forecast"), // Order History
+                leading: const Icon(Icons.history_rounded),
+                title: const Text("Ticket History"), // Order History
               ),
               const Divider(
                 thickness: 1,
@@ -152,10 +161,10 @@ class _ControlPageState extends State<ControlPage> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (_) => const TicketHistoryPage()));
+                          builder: (_) => const WeatherForecastPage()));
                 },
-                leading: const Icon(Icons.history_rounded),
-                title: const Text("Ticket History"), // Order History
+                leading: const Icon(Icons.wb_sunny_outlined),
+                title: const Text("Weather Forecast"), // Weather Forecast
               ),
               const Divider(
                 thickness: 1,
@@ -177,7 +186,8 @@ class _ControlPageState extends State<ControlPage> {
               ),
               ListTile(
                 onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsPage()));
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (_) => const SettingsPage()));
                 },
                 leading: const Icon(Icons.settings_outlined),
                 title: const Text("Settings"),
@@ -187,7 +197,7 @@ class _ControlPageState extends State<ControlPage> {
                 leading: const Icon(Icons.logout_outlined),
                 title: const Text("Log Out"),
                 onTap: () {
-                  // AuthService().signOut();
+                  AuthService().signOut();
                 },
               ),
             ],

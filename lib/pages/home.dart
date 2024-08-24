@@ -37,11 +37,12 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            
-             Consumer<PostProvider>(
+            Consumer<PostProvider>(
               builder: (context, postProvider, child) {
                 if (postProvider.posts.isEmpty) {
-                  return const CircularProgressIndicator();
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
                 }
                 return ListView.builder(
                   shrinkWrap: true,
@@ -53,7 +54,6 @@ class _HomePageState extends State<HomePage> {
                 );
               },
             ),
-
           ],
         ),
       ),
@@ -73,13 +73,15 @@ Widget _feedCard(Post post) {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          ListTile(
-            leading: Icon(
-              Icons.landscape,
-              color: mcgpalette0[50],
+          Expanded(
+            child: ListTile(
+              leading: Icon(
+                Icons.landscape,
+                color: mcgpalette0[50],
+              ),
+              title: Text(post.title),
+              subtitle: Text(post.subtitle),
             ),
-            title: Text(post.title),
-            subtitle: Text(post.subtitle),
           ),
           Expanded(
             child: FadeInImage(
@@ -87,9 +89,15 @@ Widget _feedCard(Post post) {
               image: NetworkImage(post.imgUrl),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Text(post.description, maxLines: 3, overflow: TextOverflow.ellipsis,),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Text(
+                post.description,
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
           ),
         ],
       ),

@@ -1,4 +1,5 @@
 // TicketDetails
+
 import 'package:flutter/material.dart';
 import 'package:passtrack/colors.dart';
 import 'package:passtrack/pages/paymentoptions.dart';
@@ -47,7 +48,12 @@ class _TicketDetailsPageState extends State<TicketDetailsPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Date: ${widget.ticketDetails.date}'),
+                  SizedBox(
+                      width: 140,
+                      child: Text(
+                        'Date: ${widget.ticketDetails.date}',
+                        overflow: TextOverflow.ellipsis,
+                      )),
                   Text('Time: ${widget.ticketDetails.time}'),
                 ],
               ),
@@ -62,6 +68,7 @@ class _TicketDetailsPageState extends State<TicketDetailsPage> {
               _buildSeatSelectionGrid(),
               const SizedBox(height: 20.0),
               ElevatedButton(
+          
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size(double.infinity, 50),
                   backgroundColor: Colors.black,
@@ -113,7 +120,15 @@ class _TicketDetailsPageState extends State<TicketDetailsPage> {
   void _onBuyTicketPressed() {
     // Implement logic to handle seat selection and ticket purchase
     //  (e.g., navigate to payment screen or show confirmation dialog)
-    Navigator.push(context, MaterialPageRoute(builder: (_) => PaymentOptions(name: widget.ticketDetails.busName, imgUrl: widget.ticketDetails.from, price: widget.ticketDetails.to,)));
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (_) => PaymentOptions(
+                  name: widget.ticketDetails.busName,
+                  route_from: widget.ticketDetails.from,
+                  route_to: widget.ticketDetails.to,
+                  price: widget.ticketDetails.price,
+                )));
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -130,6 +145,7 @@ class TicketDetails {
   final String to;
   final String date;
   final String time;
+  final double price;
 
   TicketDetails({
     required this.busName,
@@ -137,5 +153,6 @@ class TicketDetails {
     required this.to,
     required this.date,
     required this.time,
+    required this.price,
   });
 }

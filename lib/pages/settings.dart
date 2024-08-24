@@ -14,7 +14,7 @@ class _SettingsPageState extends State<SettingsPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: mcgpalette0[50],
-        title: const Text("Notifications"),
+        title: const Text("Settings"),
       ),
       body: SingleChildScrollView(
         child: Column(

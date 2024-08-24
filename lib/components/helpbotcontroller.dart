@@ -75,6 +75,8 @@ class HelpbotController extends GetxController {
         'message': message,
         'timestamp': FieldValue.serverTimestamp(),
       });
+
+
     }
   }
 
