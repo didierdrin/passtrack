@@ -26,7 +26,7 @@ class _BookingPageState extends State<BookingPage> {
   String busSvg = 'assets/images/busSvg.svg';
   String rightLeftSvg = 'assets/images/rightLeftSvg';
 
-  final List<String> cities = ['Nyabugogo', 'Muhanga', 'Huye', 'Musanze'];
+  final List<String> cities = ['Nyabugogo', 'Muhanga', 'Ruhango', 'Nyanza', 'Huye', 'Rusizi', 'Gasarenda', 'Nyamagabe', 'Kitabi', 'Pindura', 'Kibeho', 'Munege', 'Munini'];
   String? fromCity;
   String? toCity;
 
@@ -390,6 +390,7 @@ class _BookingPageState extends State<BookingPage> {
         MaterialPageRoute(
           builder: (_) => TicketDetailsPage(
             ticketDetails: TicketDetails(
+              departure: ticket.departureTimestamp.toDate().toString(),
               price: ticket.price,
               busName: ticket.busName,
               from: ticket.routeFrom,
@@ -413,7 +414,8 @@ class _BookingPageState extends State<BookingPage> {
           context,
           MaterialPageRoute(
             builder: (_) => TicketDetailsPage(
-              ticketDetails: TicketDetails(
+              ticketDetails: TicketDetails( 
+                departure: ticket.departureTimestamp.toDate().toString(),
                 price: ticket.price,
                 busName: ticket.busName,
                 from: ticket.routeFrom,

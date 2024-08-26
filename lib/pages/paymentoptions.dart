@@ -20,12 +20,17 @@ class PaymentOptions extends StatefulWidget {
       required this.name,
       required this.price,
       required this.route_from,
-      required this.route_to});
+      required this.route_to, 
+      required this.departure, 
+      //required this.created_time,
+      });
 
   final String name;
   final double price;
   final String route_from;
   final String route_to;
+  final String departure;
+  //final String created_time;
   @override
   State<PaymentOptions> createState() => _PaymentOptions();
 }
@@ -39,13 +44,35 @@ class _PaymentOptions extends State<PaymentOptions> {
   final String paypalname = "assets/images/fontisto_paypalpaypalsvg.svg";
   final String cardsvg = "assets/images/ion_card-outlinecardsvg.svg";
   final String mtnlogo = "assets/images/mtn.png";
+  String? qrData;
 
   Future<void> sendTicketDetailsToFirestore(
-      String name, double price, String route_from, String route_to) async {
+      String name, double price, String route_from, String route_to, String departure) async {
     try {
       // Get the current user
       User? user = FirebaseAuth.instance.currentUser;
       if (user != null) {
+        final pDate = FieldValue.serverTimestamp();
+
+        // Fetch the user's full name from Firestore
+        DocumentSnapshot userInfoDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .collection('userinfo')
+            .doc('default_doc_id')
+            .get();
+
+        String fullName = user.email ?? 'Unknown';
+        if (userInfoDoc.exists) {
+          String fetchedName = userInfoDoc.get('full name');
+          if (fetchedName.isNotEmpty) {
+            fullName = fetchedName;
+          }
+        }
+
+        qrData =
+            'VALID_TICKET_${route_from}_${route_to}_${pDate}_${user.email}_${name}_$price';
+
         // Create a reference to the user's tickethistory collection
         CollectionReference ticketHistory = FirebaseFirestore.instance
             .collection('users')
@@ -59,23 +86,43 @@ class _PaymentOptions extends State<PaymentOptions> {
             'price': price,
             'route_from': route_from,
             'route_to': route_to,
-            'purchaseDate': FieldValue.serverTimestamp(),
+            'purchaseDate': pDate,
+            'qrData': qrData,
+            'status': 'active',
+            'departure': departure,
           },
           'userdetails': {
-            'name': user.email ?? 'Unknown',
+            'name': fullName,
+            'email': user.email ?? 'Unknown',
           },
         });
 
         // Create a reference to the totalpurchases collection
         CollectionReference totalPurchases =
             FirebaseFirestore.instance.collection('totalpurchases');
-
         await totalPurchases.add({
           'name': name,
           'price': price,
-          'route_from': route_from, 
+          'route_from': route_from,
           'route_to': route_to,
           'purchaseDate': FieldValue.serverTimestamp(),
+          'email': user.email ?? 'Unknown',
+        });
+
+        // Create a reference to the 'notscanned' collection
+        CollectionReference notScanned =
+            FirebaseFirestore.instance.collection('notscanned');
+        // Add the same ticket to the 'notscanned' collection
+        await notScanned.add({
+          'name': name,
+          'price': price,
+          'route_from': route_from,
+          'route_to': route_to,
+          'purchaseDate': pDate,
+          'qrData': qrData,
+          'status': 'active',
+          'client_uid': user.uid,
+          'email': user.email ?? 'Unknown',
         });
 
         logger.d('Ticket details sent to Firestore successfully');
@@ -171,7 +218,7 @@ class _PaymentOptions extends State<PaymentOptions> {
                           logger.d('Card payment successful: $result');
                           // Send ticket details to Firestore Card Payment 1
                           await sendTicketDetailsToFirestore(widget.name,
-                              widget.price, widget.route_from, widget.route_to);
+                              widget.price, widget.route_from, widget.route_to, widget.departure);
 
                           // Navigate to ConfirmPage and remove all previous routes
                           Navigator.pushAndRemoveUntil(

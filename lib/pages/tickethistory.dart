@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // Import for Firebase Firestore
 import 'package:passtrack/colors.dart';
 import 'package:passtrack/pages/ticketinfo.dart';
 import 'package:passtrack/components/tickethistory_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
 
 class TicketHistoryPage extends StatefulWidget {
   const TicketHistoryPage({super.key});
@@ -13,12 +13,14 @@ class TicketHistoryPage extends StatefulWidget {
 }
 
 class _TicketHistoryPageState extends State<TicketHistoryPage> {
+  String searchQuery = '';
+
   @override
   void initState() {
     super.initState();
-    // Fetch tickets when the page is initialized
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<TicketHistoryProvider>(context, listen: false).fetchTicketHistory();
+      Provider.of<TicketHistoryProvider>(context, listen: false)
+          .fetchTicketHistory();
     });
   }
 
@@ -29,46 +31,86 @@ class _TicketHistoryPageState extends State<TicketHistoryPage> {
         backgroundColor: mcgpalette0[50],
         title: const Text("Ticket History"),
       ),
-      body: Consumer<TicketHistoryProvider>(
-        builder: (context, provider, child) {
-          if (provider.tickets.isEmpty) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          return CustomScrollView(
-            slivers: [
-              SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    final ticket = provider.tickets[index];
+      body: Column(
+        children: [
+          // Search bar
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: _buildSearchBar(),
+          ),
+          // Ticket list
+          Expanded(
+            child: Consumer<TicketHistoryProvider>(
+              builder: (context, provider, child) {
+                if (provider.tickets.isEmpty) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                // Filter tickets based on search query, ignoring purchaseDate
+                final filteredTickets = provider.tickets.where((ticket) {
+                  return ticket['name']
+                          .toLowerCase()
+                          .contains(searchQuery.toLowerCase()) ||
+                      ticket['userName']
+                          .toLowerCase()
+                          .contains(searchQuery.toLowerCase());
+                  // Exclude purchaseDate from the search filtering
+                }).toList();
+
+                return ListView.builder(
+                  itemCount: filteredTickets.length,
+                  itemBuilder: (context, index) {
+                    final ticket = filteredTickets[index];
                     return _ticketTile(context, ticket);
                   },
-                  childCount: provider.tickets.length,
-                ),
-              ),
-              // You can add more slivers here if needed
-            ],
-          );
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Search Bar Widget
+  Widget _buildSearchBar() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: TextField(
+        decoration: InputDecoration(
+          hintText: 'Search tickets...',
+          prefixIcon: const Icon(Icons.search),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+        onChanged: (value) {
+          setState(() {
+            searchQuery = value;
+          });
         },
       ),
     );
   }
 }
 
+// Modifying _ticketTile to exclude purchaseDate from the search criteria
 Widget _ticketTile(BuildContext context, Map<String, dynamic> ticket) {
-  final DateFormat formatter = DateFormat('yyyy-MM-dd HH:mm');
   return Card(
     elevation: 1,
     child: ListTile(
       onTap: () {
-        Navigator.push(context,
-            MaterialPageRoute(builder: (_) => TicketInfo(ticket: ticket)));
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => TicketInfo(ticket: ticket)),
+        );
       },
       title: Text(ticket['name']),
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text("Price: RWF ${ticket['price']}"),
-          Text("Purchased: ${formatter.format(ticket['purchaseDate'])}"),
+          Text("Purchased: ${ticket['purchaseDate']}"), // purchaseDate is still displayed as a string
           Text("User: ${ticket['userName']}"),
         ],
       ),

@@ -42,53 +42,93 @@ class _MomoPageState extends State<MomoPage> {
   String selectedCurrency = "";
 
   bool isTestMode = true;
+  String? qrData;
 
   Future<void> sendTicketDetailsToFirestore(
-      String name, double price, String route_from, String route_to) async {
-    try {
-      // Get the current user
-      User? user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        // Create a reference to the user's tickethistory collection
-        CollectionReference ticketHistory = FirebaseFirestore.instance
-            .collection('users')
-            .doc(user.uid)
-            .collection('tickethistory');
-
-        // Add a new document with a generated ID
-        await ticketHistory.add({
-          'ticketdetails': {
-            'name': name,
-            'price': price,
-            'route_from': route_from,
-            'route_to': route_to,
-            'purchaseDate': FieldValue.serverTimestamp(),
-          },
-          'userdetails': {
-            'name': user.email ?? 'Unknown',
-          },
-        });
-
-        // Create a reference to the totalpurchases collection
-        CollectionReference totalPurchases =
-            FirebaseFirestore.instance.collection('totalpurchases');
-
-        await totalPurchases.add({
+    String name, double price, String route_from, String route_to) async {
+  try {
+    // Get the current user
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final pDate = FieldValue.serverTimestamp();
+      
+      // Fetch the user's full name from Firestore
+      DocumentSnapshot userInfoDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('userinfo')
+          .doc('default_doc_id')
+          .get();
+      
+      String fullName = user.email ?? 'Unknown';
+      if (userInfoDoc.exists) {
+        String fetchedName = userInfoDoc.get('full name');
+        if (fetchedName.isNotEmpty) {
+          fullName = fetchedName;
+        }
+      }
+      
+      qrData =
+          'VALID_TICKET_${route_from}_${route_to}_${pDate}_${user.email}_${name}_$price';
+      
+      // Create a reference to the user's tickethistory collection
+      CollectionReference ticketHistory = FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('tickethistory');
+      
+      // Add a new document with a generated ID
+      await ticketHistory.add({
+        'ticketdetails': {
           'name': name,
           'price': price,
-          'route_from': route_from, 
+          'route_from': route_from,
           'route_to': route_to,
-          'purchaseDate': FieldValue.serverTimestamp(),
-        });
-
-        logger.d('Ticket details sent to Firestore successfully');
-      } else {
-        logger.e('No user is currently signed in');
-      }
-    } catch (e) {
-      logger.e('Error sending ticket details to Firestore: $e');
+          'purchaseDate': pDate,
+          'qrData': qrData,
+          'status': 'active',
+        },
+        'userdetails': {
+          'name': fullName,
+          'email': user.email ?? 'Unknown',
+        },
+      });
+      
+      // Create a reference to the totalpurchases collection
+      CollectionReference totalPurchases =
+          FirebaseFirestore.instance.collection('totalpurchases');
+      await totalPurchases.add({
+        'name': name,
+        'price': price,
+        'route_from': route_from,
+        'route_to': route_to,
+        'purchaseDate': FieldValue.serverTimestamp(),
+        'email': user.email ?? 'Unknown',
+      });
+      
+      // Create a reference to the 'notscanned' collection
+      CollectionReference notScanned = FirebaseFirestore.instance.collection('notscanned');
+      // Add the same ticket to the 'notscanned' collection
+      await notScanned.add({
+        'name': name,
+        'price': price,
+        'route_from': route_from,
+        'route_to': route_to,
+        'purchaseDate': pDate,
+        'qrData': qrData,
+        'status': 'active',
+        'client_uid': user.uid,
+        'email': user.email ?? 'Unknown',
+      });
+      
+      logger.d('Ticket details sent to Firestore successfully');
+    } else {
+      logger.e('No user is currently signed in');
     }
+  } catch (e) {
+    logger.e('Error sending ticket details to Firestore: $e');
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -212,7 +252,7 @@ class _MomoPageState extends State<MomoPage> {
 
     final Flutterwave flutterwave = Flutterwave(
         context: context,
-        publicKey: "FLWPUBK_TEST-0ecb93e6c52b1c1c7625b9368f4992af-X",
+        publicKey: "FLWPUBK_TEST-ab0db75066081fdc2501e5eb2cf42da1-X", //"FLWPUBK_TEST-0ecb93e6c52b1c1c7625b9368f4992af-X",
         currency: selectedCurrency,
         redirectUrl: 'https://facebook.com',
         txRef: const Uuid().v1(),

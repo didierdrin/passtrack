@@ -30,15 +30,19 @@ class TicketHistoryProvider with ChangeNotifier {
 
           return {
             'name': ticketDetails['name'] as String,
+            'departure': ticketDetails['departure'] as String,
             'price': ticketDetails['price'] as num,
+            'route_from': ticketDetails['route_from'] as String,
+            'route_to': ticketDetails['route_to'] as String,
+            'qrData': ticketDetails['qrData'] as String,
             'purchaseDate':
                 (ticketDetails['purchaseDate'] as Timestamp).toDate(),
             'userName': userDetails['name'] as String,
           };
         }).toList();
 
-      
-      // normal codes of this page
+        // Sort tickets by purchaseDate (date, hours, and minutes)
+        _tickets.sort((a, b) => (b['purchaseDate'] as DateTime).compareTo(a['purchaseDate'] as DateTime));
 
         notifyListeners();
       }

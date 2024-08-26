@@ -19,6 +19,7 @@ class _TicketDetailsPageState extends State<TicketDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
+    print(widget.ticketDetails.busName);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: mcgpalette0[50],
@@ -68,7 +69,6 @@ class _TicketDetailsPageState extends State<TicketDetailsPage> {
               _buildSeatSelectionGrid(),
               const SizedBox(height: 20.0),
               ElevatedButton(
-          
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size(double.infinity, 50),
                   backgroundColor: Colors.black,
@@ -128,6 +128,8 @@ class _TicketDetailsPageState extends State<TicketDetailsPage> {
                   route_from: widget.ticketDetails.from,
                   route_to: widget.ticketDetails.to,
                   price: widget.ticketDetails.price,
+                  //created_time: widget.ticketDetails.time,
+                  departure: widget.ticketDetails.departure,
                 )));
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -146,6 +148,7 @@ class TicketDetails {
   final String date;
   final String time;
   final double price;
+  final String departure;
 
   TicketDetails({
     required this.busName,
@@ -154,5 +157,6 @@ class TicketDetails {
     required this.date,
     required this.time,
     required this.price,
+    required this.departure,
   });
 }

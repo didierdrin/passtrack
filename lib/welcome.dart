@@ -36,7 +36,7 @@ class WelcomePageState extends State<WelcomePage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 80),
+                    const SizedBox(height: 60),
                     RichText(
                       text: TextSpan(children: [
                         TextSpan(
@@ -77,6 +77,7 @@ class WelcomePageState extends State<WelcomePage> {
               ),
               Container(
                 decoration: BoxDecoration(
+      
                   color: mcgpalette0[50]!,
                   borderRadius: const BorderRadius.only(topRight: Radius.circular(20)),
                 ),
